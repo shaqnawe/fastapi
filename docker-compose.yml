@@ -2,22 +2,16 @@ services:
   api:
     container_name: fastapi-app
     build: .
+    entrypoint: [ "sh", "./entrypoint.sh" ]
     depends_on:
       [postgres]
     ports:
       - "8000:8000"
     volumes:
-      - ./:/usr/src/app:ro
+      - ./:/usr/src/app # removed ':ro' for write access
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    environment:
-      DATABASE_HOSTNAME: postgres
-      DATABASE_PORT: 5432
-      DATABASE_PASSWORD: password
-      DATABASE_NAME: fastapi
-      DATABASE_USERNAME: postgres
-      SECRET_KEY: bb225f28423082df94397264bce3cf911685c8a22053af0a759c3d6156b21624
-      ALGORITHM: HS256
-      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+    env_file:
+      - .env
   postgres:
     container_name: fastapi-db
     image: postgres
