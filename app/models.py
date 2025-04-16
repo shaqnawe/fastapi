@@ -36,3 +36,8 @@ class Vote(SQLModel, table=True):
 
     user_id: int = Field(foreign_key="users.id", ondelete="CASCADE", primary_key=True)
     post_id: int = Field(foreign_key="posts.id", ondelete="CASCADE", primary_key=True)
+
+
+Post.model_rebuild()
+User.model_rebuild()
+Vote.model_rebuild()

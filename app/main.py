@@ -22,4 +22,4 @@ app.include_router(vote.router)
 
 @app.get("/")
 async def root():
-    return {"nessage": "Welcome to my api!"}
+    return {"nessage": "Welcome to my api!!"}

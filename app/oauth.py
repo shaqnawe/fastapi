@@ -29,13 +29,13 @@ def verify_access_token(token: str, credentials_exception):
     print("🔐 Verifying token:", token)
     try:
         payload = jwt.decode(token, KEY, algorithms=ALGORITHM)
-        print("✅ Decoded payload:", payload)
+        # print("✅ Decoded payload:", payload)
         print(f"USER ID TYPE: {type(payload.get('user_id'))}")
         user_id: int = payload.get("user_id")
         if user_id is None:
-            print("✅ Decoded payload:", payload)
+            # print("✅ Decoded payload:", payload)
             raise credentials_exception
-        print(f"USERID : {user_id}")
+        # print(f"USERID : {user_id}")
         return TokenData(id=int(user_id))
     except JWTError as e:
         print("🚫 JWT error:", str(e))
@@ -51,9 +51,9 @@ def get_current_user(db: SessionDep, token: str = Depends(oauth2_scheme)):
     )
 
     token_data = verify_access_token(token, credentials_exception)
-    print("✅ Token data:", token_data)
+    # print("✅ Token data:", token_data)
     user = db.exec(select(User).where(User.id == token_data.id)).first()
     if not user:
         raise credentials_exception
-    print("✅ User found:", user.email)
+    # print("✅ User found:", user.email)
     return user
