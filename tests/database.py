@@ -1,19 +1,23 @@
 import time
-from typing import Annotated
-from fastapi import Depends
+import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy.exc import OperationalError
-from sqlmodel import create_engine, Session
-from app.models import Post, User, Vote
-from .config import settings
+from sqlmodel import create_engine, Session, SQLModel
+from app.main import app
+from app.config import settings
+from app.database import get_session
 
 DATABASE_URL = (
     f"postgresql+psycopg://{settings.database_username}:"
     f"{settings.database_password}@"
     f"{settings.database_hostname}:"
     f"{settings.database_port}/"
-    f"{settings.database_name}"
+    f"{settings.database_name}_test"
 )
+
 engine = create_engine(DATABASE_URL, echo=True)
+
+SQLModel.metadata.create_all(bind=engine)
 
 # Retry logic: wait for DB to be ready
 MAX_RETRIES = 10
@@ -29,13 +33,20 @@ else:
     print("Could not connect to the database after multiple retries.")
     raise RuntimeError("Database not available")
 
-# Handled by alembic instead
-# SQLModel.metadata.create_all(bind=engine)
 
-
-def get_session():
+@pytest.fixture()
+def session():
+    SQLModel.metadata.drop_all(bind=engine)
+    SQLModel.metadata.create_all(bind=engine)
     with Session(engine) as session:
         yield session
 
 
-SessionDep = Annotated[Session, Depends(get_session)]
+@pytest.fixture()
+def client(session):
+    def override_get_session():
+        with session:
+            yield session
+
+    app.dependency_overrides[get_session] = override_get_session
+    yield TestClient(app)

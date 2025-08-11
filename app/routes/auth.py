@@ -17,7 +17,7 @@ OAuth2Dep = Annotated[OAuth2PasswordRequestForm, Depends()]
 @router.post("/login", response_model=Token)
 def login(credentials: OAuth2Dep, db: SessionDep):
     user = db.exec(select(User).where(User.email == credentials.username)).first()
-    print(user.model_dump())
+    # print(user.model_dump())
     if not user or not verify_password(credentials.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Invalid credentials."

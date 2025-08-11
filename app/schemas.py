@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from sqlmodel import SQLModel
 from pydantic import EmailStr
@@ -21,16 +21,18 @@ class PostResponse(PostBase):
     updated_at: datetime
     user_id: int
 
-    class Config:
-        from_attributes = True
+    # class Config:
+    #     from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PostVote(BaseModel):
     post: PostResponse
     votes: int
 
-    class Config:
-        from_attributes = True
+    # class Config:
+    #     from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserCreate(SQLModel):
@@ -46,8 +48,9 @@ class UserResponse(SQLModel):
     last_name: str
     email: EmailStr
 
-    class Config:
-        from_attributes = True
+    # class Config:
+    #     from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserLogin(BaseModel):
